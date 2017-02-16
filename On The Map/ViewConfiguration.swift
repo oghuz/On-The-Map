@@ -15,8 +15,8 @@ class ViewConfiguration: UIView{
         let instance = ViewConfiguration()
         return instance
     }()
-
-
+    
+    
     //#MARK: -ViewSetup
     override class var layerClass: AnyClass{
         return CAGradientLayer.self
@@ -34,22 +34,22 @@ class ViewConfiguration: UIView{
         caDradienLayer.frame = frame
         let colors = [upperColor.cgColor, lowerColoer.cgColor]
         caDradienLayer.colors = colors
-
+        
         return caDradienLayer
         
     }
-    //creating a button on call
+    //configure a button on call
     func buttonConfig(_ button: UIButton, backgroundColor: UIColor?, textColor: UIColor?, forState: UIControlState?, title: String?){
-    
+        
         button.clipsToBounds = true
         button.layer.cornerRadius = 4.0
         button.backgroundColor = backgroundColor
         button.setTitleColor(textColor, for: forState!)
         button.setTitle(title, for: forState!)
-    
-    }
-    
         
+    }
+        
+    
 }
 
 

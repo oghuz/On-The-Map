@@ -20,49 +20,44 @@ class OnTheMapNetworking: NSObject{
     // shared session
     var session = URLSession.shared
     
+    //initializing
     override init(){
         super.init()
     }
     
     //#MARK: - GET URL request
-    func taskForGETMethod(_ method: String, _ parameters: [String: AnyObject]?, hostName: String?, pathName: String?, needParseValues: Bool,complitionHandlerForGET: @escaping(_ result:AnyObject?, _ error: NSError?)->Void)->URLSessionDataTask{
+    func taskForGETMethod(_ method: String?, _ parameters: [String: AnyObject]?, hostName: String?, pathName: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForGET: @escaping(_ result:AnyObject?, _ data: Data?, _ error: NSError?)->Void)->URLSessionDataTask{
         
         //set parameters
-        
-        let request = requestForReuse(URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method), requestMethod: "GET", addParseValues: needParseValues)
-        
+        let url = URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method)
+        let request = requestForReuse(url, requestMethod: "GET", addParseValues: needParseValues, addValueToRequest: needHeaderValues)
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
             func sendError(_ error: String){
+                print(error)
                 let userInfo = [NSLocalizedDescriptionKey: error]
-                complitionHandlerForGET(nil, NSError(domain: "taskForGETMethod", code: 1, userInfo: userInfo))
+                complitionHandlerForGET(nil, nil, NSError(domain: "taskForGETMethod", code: 1, userInfo: userInfo))
             }
             //ckecking for error
             guard (error == nil) else{
-                Alert.SharedInstance.alert("Network Error", message: "\(error)", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+                sendError("-------there is an error \(error)")
                 return
             }
             
             //check Status code
-            
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else{
-                Alert.SharedInstance.alert("Network Error", message: "network status code error", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+                let theCode = (response as? HTTPURLResponse)?.statusCode
+                sendError("-----------status code not in range for GET request \(error), athe Code Is \(theCode)")
                 return
             }
             
             guard let data = data else{
-            
-                Alert.SharedInstance.alert("Network Error", message: "No data was returned", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+                sendError("-------no data found \(error)")
                 return
-            
             }
             
-            self.parseDataWithComplitionHandler(data, complitionHandlerForConvertData: complitionHandlerForGET)
-            
+            self.parseDataWithComplitionHandler(data, passOriginalData: needOriginalData, complitionHandlerForConvertData: complitionHandlerForGET)
         }
         
         task.resume()
@@ -71,40 +66,40 @@ class OnTheMapNetworking: NSObject{
     
     //#MARK: -Task for POST/PUT/DELETE
     
-    func taskForMutableRequest(_ method: String, requestMethod: String ,parameters: [String: AnyObject]?, hostName: String?, pathName: String?, jsonBody: String?, needParseValues: Bool ,complitionHandlerForMutableRequest: @escaping(_ result: AnyObject?, _ error: Error?)->Void)->URLSessionDataTask{
-    
-        let request = requestForReuse(URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method), requestMethod: requestMethod, addParseValues: needParseValues)
+    func taskForMutableRequest(_ method: String?, requestMethod: String ,parameters: [String: AnyObject]?, hostName: String?, pathName: String?, jsonBody: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForMutableRequest: @escaping(_ result: AnyObject?, _ originaldata: Data? ,_ error: Error?)->Void)->URLSessionDataTask{
+        
+        let request = requestForReuse(URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method), requestMethod: requestMethod, addParseValues: needParseValues, addValueToRequest: needHeaderValues)
         
         request.httpBody = jsonBody?.data(using: String.Encoding.utf8)
-        
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
             func sendError(_ error: String){
                 let userInfo = [NSLocalizedDescriptionKey: error]
-                complitionHandlerForMutableRequest(nil, NSError(domain: "taskForGETMethod", code: 1, userInfo: userInfo))
+                complitionHandlerForMutableRequest(nil, nil, NSError(domain: "taskFor\(requestMethod)Method", code: 1, userInfo: userInfo))
             }
             //ckecking for error
             guard (error == nil) else{
-                Alert.SharedInstance.alert("Network Error", message: "\(error)", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+                sendError("----net work error \(error)")
                 return
             }
             
             //check Status code
-            
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else{
-                Alert.SharedInstance.alert("Network Error", message: "network status code error", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+                let theCode = (response as? HTTPURLResponse)?.statusCode
+                sendError("--------status code not in range for \(requestMethod) request------ \(error), \(theCode)")
+                
                 return
             }
             
-            guard let data = data else{
-                Alert.SharedInstance.alert("Network Error", message: "No data was returned", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-                sendError(error as! String)
+            if let data = data {
+                
+                self.parseDataWithComplitionHandler(data, passOriginalData: needOriginalData, complitionHandlerForConvertData: complitionHandlerForMutableRequest)
+            }
+            else{
+                sendError("----no data found\(error)")
                 return
             }
             
-            self.parseDataWithComplitionHandler(data, complitionHandlerForConvertData: complitionHandlerForMutableRequest)
         }
         
         task.resume()
@@ -127,48 +122,52 @@ extension OnTheMapNetworking{
             for (key, value) in parameters{
                 let queryItem = URLQueryItem(name: key, value:"\(value)")
                 components.queryItems!.append(queryItem)
-                
             }
         }
         return components.url!
     }
     
-    
     //making reusable network request
-    func requestForReuse(_ url: URL, requestMethod: String, addParseValues: Bool) -> NSMutableURLRequest {
-        let request = NSMutableURLRequest.init(url: url)
+    func requestForReuse(_ url: URL, requestMethod: String, addParseValues: Bool, addValueToRequest: Bool) -> NSMutableURLRequest {
+        let request = NSMutableURLRequest(url: url)
         request.httpMethod = requestMethod
         //checking if parse API key value needed
         if addParseValues == true{
-        request.addValue(ParametersValue.APIKey, forHTTPHeaderField: ParametersKey.APIKey)
-        request.addValue(ParametersValue.ApplicationID, forHTTPHeaderField: ParametersKey.ApplicationID)
+            request.addValue(ParametersValue.APIKey, forHTTPHeaderField: ParametersKey.APIKey)
+            request.addValue(ParametersValue.ApplicationID, forHTTPHeaderField: ParametersKey.ApplicationID)
         }
-        
-        request.addValue(Constents.ApplicationJson, forHTTPHeaderField: Constents.Accept)
-        request.addValue(Constents.ApplicationJson, forHTTPHeaderField: Constents.ContentType)
-
-        
+        //checking if need to add value to header field
+        if addValueToRequest == true{
+            request.addValue(Constents.ApplicationJson, forHTTPHeaderField: Constents.Accept)
+            request.addValue(Constents.ApplicationJson, forHTTPHeaderField: Constents.ContentType)
+        }
         return request
     }
     
     //helper function that parses json data
-    func parseDataWithComplitionHandler(_ data: Data, complitionHandlerForConvertData: (_ result:AnyObject?, _ error: NSError?)->Void){
+    fileprivate func parseDataWithComplitionHandler(_ data: Data, passOriginalData: Bool ,complitionHandlerForConvertData: (_ result:AnyObject?, _ originaldata: Data? ,_ error: NSError?)->Void){
         
-        var parsedData: AnyObject? = nil
-        
-        do {
-            try parsedData = JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
-        } catch {
-            Alert.SharedInstance.alert("No data found", message: "Error while converting data", cancel: "Cancel", ok: "OK", alertStyle: .alert, actionStyle: .default, complitionHandler: nil)
-            let userInfo = [NSLocalizedDescriptionKey: error]
-            complitionHandlerForConvertData(nil, NSError(domain: "parseDataWithComplitionHandler", code: 1, userInfo: userInfo))
+        if passOriginalData == true {
+            complitionHandlerForConvertData(nil, data, nil)
         }
-        
-        complitionHandlerForConvertData(parsedData, nil)
-        
+        else{
+            
+            //let stringData = NSString(data: data, encoding: String.Encoding.utf8.rawValue)!
+            //let newData = stringData.data(using: String.Encoding.utf8.rawValue)
+            var parsedData: AnyObject? = nil
+            
+            do {
+                parsedData = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
+            } catch {
+                let userInfo = [NSLocalizedDescriptionKey: error]
+                complitionHandlerForConvertData(nil, data ,NSError(domain: "parseDataWithComplitionHandler", code: 1, userInfo: userInfo))
+            }
+            
+            complitionHandlerForConvertData(parsedData, nil, nil)
+        }
     }
-
     
-        
+    
+    
 }
 

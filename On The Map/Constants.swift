@@ -17,18 +17,21 @@ extension OnTheMapNetworking{
         static let UdacityHostName = "www.udacity.com"
         static let ParseHostName = "parse.udacity.com"
         static let UdacityAPIPath = "/api/session"
-        static let ParseAPIPath = "/parse/classes/StudentLocation"
+        static let UdacityUserAPIPath = "/api/users/"
+        static let ParseAPIPath = "/parse/classes/StudentLocation/"
         static let Account = "account"
         static let DidRegistered = "registered"
-        static let UniqueKey = "key"
+        static let Key = "key"
         static let Session = "session"
         static let SessionID = "id"
         static let ExpirationDate = "expiration"
         static let ApplicationJson = "application/json"
         static let Accept = "Accept"
+        static let Udacity = "udacity"
         static let ContentType = "Content-Type"
         static let UserName = "username"
         static let Passward = "password"
+        
         
         //UDAcity login/Logout Auth URL
         static let UdacityAuthMethodURL = "https://www.udacity.com/api/session"
@@ -50,8 +53,8 @@ extension OnTheMapNetworking{
     
     //parse api parameters
     struct ParametersKey {
-        static let APIKey = "api_key"
-        static let ApplicationID = "application_id"
+        static let APIKey = "X-Parse-REST-API-Key"
+        static let ApplicationID = "X-Parse-Application-Id"
     }
     
     struct ParametersValue {
@@ -72,7 +75,6 @@ extension OnTheMapNetworking{
         static let longitude = "longitude"
         static let createdAt = "createdAt"
         static let updatedAt = "updatedAt"
-        static let ACL = "ACL"
     }
     
     
