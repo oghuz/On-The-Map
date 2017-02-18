@@ -29,7 +29,7 @@ class TableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //tableView.reloadData()
+        
         tableView.delegate = self
         tableView.dataSource = self
         
@@ -57,8 +57,7 @@ class TableViewController: UIViewController {
                 studentInfoArray.sharedInstance.studentInfo = information
                 uiupdateOnMainQueue {
                     self.tableView.reloadData()
-                    self.activityIndicator.stopAnimating()
-                    //self.view.alpha = 1.0
+                    self.activityIndicator.stopAnimating()                    
                 }
             }
         }

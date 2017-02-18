@@ -38,6 +38,7 @@ class MapViewController: UIViewController {
         }
         
         mapView.delegate = self
+        
         activityIndicator.hidesWhenStopped = true
         
         parent?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "LogOut", style: .plain, target: self, action: #selector(logout))
@@ -51,20 +52,22 @@ class MapViewController: UIViewController {
     
     func callGetStudentLocation() {
         
-        //start activity indicator
-        //activityIndicator.alpha = 1.0
         activityIndicator.startAnimating()
+        
         view.alpha = 0.7
         
         OnTheMapNetworking.SharedInstance.getStudentsLocations { (studentInformation, error) in
             if let information = studentInformation{
+                
                 studentInfoArray.sharedInstance.studentInfo = information
                 uiupdateOnMainQueue {
+                    self.activityIndicator.stopAnimating()
                     self.showPinOnMap(studentInfoArray.sharedInstance.studentInfo)
                 }
             }
             else{
                 uiupdateOnMainQueue {
+                    self.activityIndicator.stopAnimating()
                     Alert.SharedInstance.alert(self,title: "DownLoad Fail", message: "No Data Downloaded !", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
                 }
                 
@@ -113,9 +116,6 @@ extension MapViewController{
             if success == true{
                 self.dismiss(animated: true, completion: nil)
             }
-            else{
-                print("\(error)")
-            }
         }
         
         dismiss(animated: true, completion: nil)
@@ -129,7 +129,6 @@ extension MapViewController{
             
             if let latitude = dataItem.latitude, let longitude = dataItem.longitude, let firsName = dataItem.firstName, let lastName = dataItem.lastName, let mediaLink = dataItem.mediaURL{
                 let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                //coordinations.append(coordinate)
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = coordinate
                 annotation.title = firsName + " " + lastName
@@ -206,7 +205,7 @@ extension MapViewController: MKMapViewDelegate{
         var mapPin = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) as? MKPinAnnotationView
         if mapPin == nil{
             mapPin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
-            //mapPin?.animatesDrop = true
+            mapPin?.animatesDrop = true
             mapPin?.pinTintColor = .red
             mapPin?.canShowCallout = true
             let rightButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))

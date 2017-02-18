@@ -87,10 +87,6 @@ extension LogInVC{
 
         //activity indicator
         activityIndicator(start: false)
-        //views background
-        let gradientLayer = ViewConfiguration.SharedInstance.viewBackgroundConfig(self.view.bounds, upperColor: .blue, lowerColoer: .cyan, starPoint: CGPoint(x: 0.0, y: 0.0), endPoint: CGPoint(x: 1.0, y: 0.5))
-        
-        view.layer.insertSublayer(gradientLayer, at: 0)
         
         // buttons configuration
         
@@ -120,13 +116,13 @@ extension LogInVC{
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        
         super.viewDidDisappear(true)
         activityIndicator(start:false)
     }
     
     
 }
-
 
 
 
@@ -186,6 +182,8 @@ extension LogInVC{
 // dealing with keyboard
 extension LogInVC: UITextFieldDelegate{
     
+
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         if (textField.returnKeyType == .next){
@@ -208,6 +206,7 @@ extension LogInVC: UITextFieldDelegate{
         if !emailField.isFirstResponder && !passwordField.isFirstResponder{
             dontHaveAccountLabel.alpha = 1.0
             signUpButton.alpha = 1.0
+            
         }
     }
     
@@ -216,6 +215,7 @@ extension LogInVC: UITextFieldDelegate{
         self.view.endEditing(true)
         dontHaveAccountLabel.alpha = 1.0
         signUpButton.alpha = 1.0
+        
     }
     
 }

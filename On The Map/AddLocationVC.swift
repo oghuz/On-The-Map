@@ -22,6 +22,7 @@ class AddLocationVC: UIViewController {
     static let keyForProfileArray = "userProfile"
     static let keyForObjectID = "ObjectID"
     
+    @IBOutlet weak var validLocationLinkLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
     
     @IBOutlet weak var mapString: UITextField!
@@ -35,7 +36,6 @@ class AddLocationVC: UIViewController {
     @IBAction func showOnMap(_ sender: UIButton) {
         
         view.endEditing(true)
-        activityIndicator.alpha = 1.0
         activityIndicator.startAnimating()
         searchForLocationAndLink()
         
@@ -57,11 +57,11 @@ class AddLocationVC: UIViewController {
         
         //button config
         ViewConfiguration.SharedInstance.buttonConfig(showOnMapButton, backgroundColor: .yellow, textColor: .black, forState: .normal, title: "Validate !")
-        activityIndicator.alpha = 0.0
         activityIndicator.stopAnimating()
         
         mapString.alpha = 1.0
         mediaUrl.alpha = 1.0
+        validLocationLinkLabel.alpha = 1.0
 
         mapView.alpha = 0.0
     }
@@ -69,7 +69,7 @@ class AddLocationVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViews()
-        
+        activityIndicator.hidesWhenStopped = true
         userProfile = userDefaults.object(forKey: AddLocationVC.keyForProfileArray) as! [String: AnyObject]
     }
     
@@ -101,6 +101,7 @@ extension AddLocationVC{
         search.start { (response, error) in
             //checking the error
             guard let theResponse = response, (error == nil) else{
+                self.activityIndicator.stopAnimating()
                 Alert.SharedInstance.alert(self,title: "Fail", message: "Invalid Location or Link", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
                 
                 return
@@ -108,6 +109,7 @@ extension AddLocationVC{
             
             guard let urlString = self.mediaUrl.text, Alert.SharedInstance.isValidURL(urlString) else{
                 uiupdateOnMainQueue {
+                    self.activityIndicator.stopAnimating()
                     Alert.SharedInstance.alert(self,title: "Fail", message: "Invalid Location or Link", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
                 }
                 return
@@ -120,6 +122,7 @@ extension AddLocationVC{
             self.mapItems = theResponse.mapItems
             self.mapString.alpha = 0.0
             self.mediaUrl.alpha = 0.0
+            self.validLocationLinkLabel.alpha = 0.0
 
             self.searchResultOnMap()
             self.navigationItem.title = "Valid link and Location"
