@@ -8,30 +8,33 @@
 
 import UIKit
 import Foundation
+import SystemConfiguration
 
 class LogInVC: UIViewController {
     
-    let userDefaults = UserDefaults.standard
     
+    let userDefaults = UserDefaults.standard
     let udacitySignupURL = URL(string: "https://auth.udacity.com/sign-up?next=https%3A%2F%2Fclassroom.udacity.com%2Fauthenticated")
     
-    
     @IBOutlet weak var loginButton: UIButton!
-    @IBOutlet weak var email: UITextField!
-    @IBOutlet weak var passward: UITextField!
+    @IBOutlet weak var emailField: UITextField!
+    @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var signUpButton: UIButton!
     @IBOutlet weak var logoUdacity: UILabel!
+    @IBOutlet weak var dontHaveAccountLabel: UILabel!
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     @IBAction func login(_ sender: Any) {
         
+        //check network connection
+    
         //starting indicator
         activityIndicator(start: true)
-        passward.resignFirstResponder()
+        passwordField.resignFirstResponder()
         
         //check if username and password is empty
-        if ((email.text?.isEmpty)! || (passward.text?.isEmpty)!) {
+        if ((emailField.text?.isEmpty)! || (passwordField.text?.isEmpty)!) {
             uiupdateOnMainQueue {
                 self.activityIndicator(start: false)
                 let error = "Email or Passward Empty !"
@@ -40,7 +43,7 @@ class LogInVC: UIViewController {
         }
             
         else{
-            OnTheMapNetworking.SharedInstance.loginWithCredentials(email.text!, passward: passward.text!, complitionHandlerForLogin: { (success, key, error) in
+            OnTheMapNetworking.SharedInstance.loginWithCredentials(userName: emailField.text!, passward: passwordField.text!, complitionHandlerForLogin: { (success, key, error) in
                 uiupdateOnMainQueue {
                     if success{
                         self.saveProfileToUserDefaults(key)
@@ -77,10 +80,11 @@ extension LogInVC{
         super.viewWillAppear(true)
         
         //text field config
-        email.placeholder = "Email"
-        email.backgroundColor = .cyan
-        passward.placeholder = "Passward"
-        passward.backgroundColor = .cyan
+        emailField.placeholder = "Email"
+        emailField.backgroundColor = .cyan
+        passwordField.placeholder = "Passward"
+        passwordField.backgroundColor = .cyan
+
         //activity indicator
         activityIndicator(start: false)
         //views background
@@ -111,8 +115,8 @@ extension LogInVC{
         }
         
         //activity indicator
-        email.delegate = self
-        passward.delegate = self
+        emailField.delegate = self
+        passwordField.delegate = self
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -185,20 +189,33 @@ extension LogInVC: UITextFieldDelegate{
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         if (textField.returnKeyType == .next){
-            email.resignFirstResponder()
-            passward.becomeFirstResponder()
+            emailField.resignFirstResponder()
+            passwordField.becomeFirstResponder()
         }
         else if (textField.returnKeyType == .done){
-            self.view.endEditing(true)
+            view.endEditing(true)
             self.login(loginButton)
         }
         return true
     }
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        dontHaveAccountLabel.alpha = 0.0
+        signUpButton.alpha = 0.0
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if !emailField.isFirstResponder && !passwordField.isFirstResponder{
+            dontHaveAccountLabel.alpha = 1.0
+            signUpButton.alpha = 1.0
+        }
+    }
     
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
+        dontHaveAccountLabel.alpha = 1.0
+        signUpButton.alpha = 1.0
     }
     
 }

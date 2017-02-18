@@ -1,67 +1,67 @@
 //
-//  TableViewController.swift
+//  NewTableViewController.swift
 //  On The Map
 //
-//  Created by osmanjan omar on 1/19/17.
+//  Created by osmanjan omar on 2/17/17.
 //  Copyright © 2017 osmanjan omar. All rights reserved.
 //
 
 import UIKit
 
-class TableViewController: UITableViewController {
+class TableViewController: UIViewController {
+
+    //let activityIndicator = UIActivityIndicatorView()
     
-    // reference of student location
-    var studentInfo = [StudentLocation]()
-    let activityIndicator = UIActivityIndicatorView()
-    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var userProfile = [String: AnyObject]()
     let userdeFaults = UserDefaults.standard
     static let keyForProfileArray = "userProfile"
     
+    @IBOutlet weak var tableView: UITableView!
     
     //#MARK: - life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-        activityIndicator.alpha = 1.0
-        activityIndicator.startAnimating()
-        
-        OnTheMapNetworking.SharedInstance.getStudentsLocations { (studentInformation, error) in
-            if let information = studentInformation{
-                self.studentInfo = information
-                uiupdateOnMainQueue {
-                    self.tableView.reloadData()
-                    self.activityIndicator.stopAnimating()
-                    self.activityIndicator.alpha = 0.0
-                }
-            }
-            else{
-                print("\(error)")
-            }
-        }
+        callGetStudentLocation()
         
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //tableView.reloadData()
+        tableView.delegate = self
+        tableView.dataSource = self
         
-        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]){            
+        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]){
             userProfile = userprofile
         }
-        
-        view.addSubview(activityIndicator)
-        activityIndicator.alpha = 1.0
-        activityIndicator.center = view.center
-        activityIndicator.activityIndicatorViewStyle = .whiteLarge
-        activityIndicator.color = .black
+        activityIndicator.hidesWhenStopped = true
         
         parent?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "LogOut", style: .plain, target: self, action: #selector(logout))
         
         let rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addLocation)),
-                                   UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(viewWillAppear(_:)))]
+                                   UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(callGetStudentLocation))]
         
         parent?.navigationItem.rightBarButtonItems = rightBarButtonItems
         
+    }
+    
+    func callGetStudentLocation(){
+        
+        uiupdateOnMainQueue {
+            self.activityIndicator.startAnimating()
+        }
+        OnTheMapNetworking.SharedInstance.getStudentsLocations { (studentInformation, error) in
+            if let information = studentInformation{
+                studentInfoArray.sharedInstance.studentInfo = information
+                uiupdateOnMainQueue {
+                    self.tableView.reloadData()
+                    self.activityIndicator.stopAnimating()
+                    //self.view.alpha = 1.0
+                }
+            }
+        }
     }
     
 }
@@ -69,7 +69,6 @@ class TableViewController: UITableViewController {
 
 //#MARK: hepler methods
 extension TableViewController{
-    
     
     func addLocation(){
         
@@ -99,7 +98,6 @@ extension TableViewController{
         present(AddLocationNavigation, animated: true, completion: nil)
     }
     
-    
     func logout(){
         
         OnTheMapNetworking.SharedInstance.logoutMethod { (success, error) in
@@ -114,37 +112,36 @@ extension TableViewController{
         dismiss(animated: true, completion: nil)
     }
     
-    
 }
 
+extension TableViewController: UITableViewDelegate, UITableViewDataSource{
 
-//#MARK: UITableView delegate and data sourse
-extension TableViewController{
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return studentInfoArray.sharedInstance.studentInfo.count
+    }
     
-    // MARK: - Table view data source
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return studentInfo.count
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
     }
     
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let reuseID = "Cell"
+        let reuseID = "NewCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseID, for: indexPath)
         
-        let information = studentInfo[indexPath.row]
-        
+        let information = studentInfoArray.sharedInstance.studentInfo[indexPath.row]
         if let firsName = information.firstName, let lastName = information.lastName, let mediaLink = information.mediaURL{
             cell.textLabel?.text = firsName + " " + lastName
             cell.detailTextLabel?.text = mediaLink
         }
         return cell
+
     }
-    
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if let urlString = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text{
             
@@ -165,7 +162,8 @@ extension TableViewController{
                 }
             }
         }
-        
+
     }
-    
+
+
 }

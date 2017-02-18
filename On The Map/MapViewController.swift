@@ -11,7 +11,6 @@ import MapKit
 
 class MapViewController: UIViewController {
     
-    var studentInfo = [StudentLocation]()
     
     var userProfile = [String: AnyObject]()
     static let keyForProfileArray = "userProfile"
@@ -19,7 +18,7 @@ class MapViewController: UIViewController {
     let userdeFaults = UserDefaults.standard
     
     var annotations = [MKPointAnnotation]()
-    //var coordinations = [CLLocationCoordinate2D]()
+    
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var mapView: MKMapView!
@@ -27,26 +26,8 @@ class MapViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-        //start activity indicator
-        activityIndicator.alpha = 1.0
-        activityIndicator.startAnimating()
-        view.alpha = 0.7
-        
-        OnTheMapNetworking.SharedInstance.getStudentsLocations { (studentInformation, error) in
-            if let information = studentInformation{
-                self.studentInfo = information
-                uiupdateOnMainQueue {
-                    self.showPinOnMap(self.studentInfo)
-                }
-            }
-            else{
-                uiupdateOnMainQueue {
-                    Alert.SharedInstance.alert(self,title: "DownLoad Fail", message: "No Data Downloaded !", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
-                }
-                
-                print("\(error)")
-            }
-        }
+        callGetStudentLocation()
+
     }
     
     override func viewDidLoad() {
@@ -57,14 +38,40 @@ class MapViewController: UIViewController {
         }
         
         mapView.delegate = self
+        activityIndicator.hidesWhenStopped = true
         
         parent?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "LogOut", style: .plain, target: self, action: #selector(logout))
         
         let rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addLocation)),
-                                   UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(viewWillAppear(_:)))]
+                                   UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(callGetStudentLocation))]
         
         parent?.navigationItem.rightBarButtonItems = rightBarButtonItems
         
+    }
+    
+    func callGetStudentLocation() {
+        
+        //start activity indicator
+        //activityIndicator.alpha = 1.0
+        activityIndicator.startAnimating()
+        view.alpha = 0.7
+        
+        OnTheMapNetworking.SharedInstance.getStudentsLocations { (studentInformation, error) in
+            if let information = studentInformation{
+                studentInfoArray.sharedInstance.studentInfo = information
+                uiupdateOnMainQueue {
+                    self.showPinOnMap(studentInfoArray.sharedInstance.studentInfo)
+                }
+            }
+            else{
+                uiupdateOnMainQueue {
+                    Alert.SharedInstance.alert(self,title: "DownLoad Fail", message: "No Data Downloaded !", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
+                }
+                
+                print("\(error)")
+            }
+        }
+    
     }
 }
 
@@ -143,7 +150,7 @@ extension MapViewController: MKMapViewDelegate{
     
     func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
         
-        activityIndicator.alpha = 0.0
+        //activityIndicator.alpha = 0.0
         activityIndicator.stopAnimating()
         view.alpha = 1.0
         

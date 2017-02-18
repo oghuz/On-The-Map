@@ -30,10 +30,13 @@ class AddLocationVC: UIViewController {
     
     @IBOutlet weak var showOnMapButton: UIButton!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     // show the the search result on map
     @IBAction func showOnMap(_ sender: UIButton) {
         
         view.endEditing(true)
+        activityIndicator.alpha = 1.0
+        activityIndicator.startAnimating()
         searchForLocationAndLink()
         
         if showOnMapButton.titleLabel?.text == "Finish"{
@@ -51,9 +54,15 @@ class AddLocationVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        
         //button config
         ViewConfiguration.SharedInstance.buttonConfig(showOnMapButton, backgroundColor: .yellow, textColor: .black, forState: .normal, title: "Validate !")
+        activityIndicator.alpha = 0.0
+        activityIndicator.stopAnimating()
         
+        mapString.alpha = 1.0
+        mediaUrl.alpha = 1.0
+
         mapView.alpha = 0.0
     }
     
@@ -103,12 +112,20 @@ extension AddLocationVC{
                 }
                 return
             }
+            uiupdateOnMainQueue {
+                self.activityIndicator.alpha = 0.0
+                self.activityIndicator.stopAnimating()
+            }
             self.showMapview()
             self.mapItems = theResponse.mapItems
+            self.mapString.alpha = 0.0
+            self.mediaUrl.alpha = 0.0
+
             self.searchResultOnMap()
             self.navigationItem.title = "Valid link and Location"
             self.showOnMapButton.setTitle("Finish", for: .normal)
             self.showOnMapButton.backgroundColor = .green
+            self.showOnMapButton.alpha = 0.6
             
         }
         
@@ -145,6 +162,8 @@ extension AddLocationVC{
                     self.userDefaults.set(objectID, forKey: AddLocationVC.keyForObjectID)
                     self.userDefaults.set(true, forKey: "didPostedLocation")
                     uiupdateOnMainQueue {
+                        self.activityIndicator.alpha = 0.0
+                        self.activityIndicator.stopAnimating()
                         self.cancel()
                     }
                     
@@ -182,6 +201,8 @@ extension AddLocationVC{
                         self.userDefaults.set(lastUpdated, forKey: "updatedAt")
                         
                         uiupdateOnMainQueue {
+                            self.activityIndicator.alpha = 0.0
+                            self.activityIndicator.stopAnimating()
                             self.cancel()
                         }
                         

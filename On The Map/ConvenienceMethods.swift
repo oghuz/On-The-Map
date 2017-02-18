@@ -11,7 +11,7 @@ import UIKit
 
 extension OnTheMapNetworking{
     //#MARK: - Log In With Username And Passward
-    func loginWithCredentials(_ userName: String, passward: String, complitionHandlerForLogin :@escaping(_ success: Bool, _ key: String?, _ error: Error?)->Void){
+    func loginWithCredentials(userName: String, passward: String, complitionHandlerForLogin :@escaping(_ success: Bool, _ key: String?, _ error: Error?)->Void){
         
         //json body of dictionary contains username and passward
         let jsonCredentials = "{\"\(Constents.Udacity)\":{\"\(Constents.UserName)\":\"\(userName)\", \"\(Constents.Passward)\":\"\(passward)\"}}"
@@ -127,9 +127,11 @@ extension OnTheMapNetworking{
     //#MARK: - Get Students Locations
     func getStudentsLocations(_ complitionHandlerForGetStudentsLocations: @escaping(_ result: [StudentLocation]?, _ error: Error?)->Void){
         
-        //calling task for Get method
+        //parameters 
+        let parameters = ["limit": 100, "order": "-updatedAt"] as [String : Any]
         
-        let _ = taskForGETMethod(nil, nil, hostName: Constents.ParseHostName, pathName: Constents.ParseAPIPath, needParseValues: true, needHeaderValues: false, needOriginalData: false) { (parsedData, originalData, error) in
+        //calling task for Get method
+        let _ = taskForGETMethod(nil, parameters as [String : AnyObject]?, hostName: Constents.ParseHostName, pathName: Constents.ParseAPIPath, needParseValues: true, needHeaderValues: false, needOriginalData: false) { (parsedData, originalData, error) in
             
             //cheking the error
             guard (error == nil) else{
