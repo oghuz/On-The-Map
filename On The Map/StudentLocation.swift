@@ -42,7 +42,7 @@ struct StudentLocation {
             createdAt = dictionary[OnTheMapNetworking.StudentLocationKey.createdAt] as! String
             updatedAt = dictionary[OnTheMapNetworking.StudentLocationKey.updatedAt] as! String
         }
-        else{
+        else {
             objectId = ""
             uniqueKey = ""
             firstName = ""
@@ -59,7 +59,7 @@ struct StudentLocation {
     
     
     // take data as parameter and create a student location object
-    static func studentInfoFromDictionary(_ results: [[String: AnyObject]])->[StudentLocation]{
+    static func studentInfoFromDictionary(_ results: [[String: AnyObject]])->[StudentLocation] {
         
         var studentLocations = [StudentLocation]()
         for result in results{
@@ -74,7 +74,7 @@ struct StudentLocation {
 
 extension StudentLocation: Equatable{}
 
-func == (lhs: StudentLocation, rhs: StudentLocation) ->Bool{
+func == (lhs: StudentLocation, rhs: StudentLocation) ->Bool {
     return lhs == rhs
 }
     

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-extension OnTheMapNetworking{
+extension OnTheMapNetworking {
     //#MARK: - Log In With Username And Passward
     func loginWithCredentials(userName: String, passward: String, complitionHandlerForLogin :@escaping(_ success: Bool, _ key: String?, _ error: Error?)->Void){
         
@@ -21,12 +21,12 @@ extension OnTheMapNetworking{
             //when we log in with udacity username and passward, the data has some security characters, parsing it will give error unless we take out the sub data,  so  in here we should skip checking if error is nil,
             
             //checking for error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 complitionHandlerForLogin(false, nil, error)
                 return
             }
             
-            guard let data = rawData else{
+            guard let data = rawData else {
                 complitionHandlerForLogin(false, nil, error)
                 
                 return
@@ -44,7 +44,7 @@ extension OnTheMapNetworking{
             if let account = result?[Constents.Account] as? [String: AnyObject], let key = account[Constents.Key] as? String ,let registered = account[Constents.DidRegistered] as? Bool, registered == true{
                 complitionHandlerForLogin(true, key, nil)
             }
-            else{
+            else {
                 complitionHandlerForLogin(false, nil, error)
                 
             }
@@ -52,19 +52,19 @@ extension OnTheMapNetworking{
     }
     
     //#MARK: - get udacity student public profile
-    func getStudentProfileInfo(_ uniqueKey: String, complitionHandlerForGetProfileInfo: @escaping(_ profileArray: [String: AnyObject]?, _ error: Error?)->Void){
+    func getStudentProfileInfo(_ uniqueKey: String, complitionHandlerForGetProfileInfo: @escaping(_ profileArray: [String: AnyObject]?, _ error: Error?)->Void) {
         
         let uniqueKey = uniqueKey
         
         let _ = taskForGETMethod(uniqueKey, nil, hostName: Constents.UdacityHostName, pathName: Constents.UdacityUserAPIPath, needParseValues: false, needHeaderValues: false, needOriginalData: true) { (result, originalData, error) in
             
             //checking for error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 complitionHandlerForGetProfileInfo(nil, error)
                 return
             }
             
-            guard let Rawdata = originalData else{
+            guard let Rawdata = originalData else {
                 complitionHandlerForGetProfileInfo(nil, error)
                 return
             }
@@ -83,11 +83,10 @@ extension OnTheMapNetworking{
                 let profileDictionary = ["first_name": first_name, "last_name": last_name, "key": key]
                 
                 complitionHandlerForGetProfileInfo(profileDictionary as [String : AnyObject]?, nil)
-                print(" ----------getStudentProfileInfo-----------the user info  array \(first_name), \(last_name), \(key)")
+
             }
-            else{
+            else {
                 complitionHandlerForGetProfileInfo(nil, error)
-                print(" ---------------------the user info  array \(error)")
             }
             
         }
@@ -95,7 +94,7 @@ extension OnTheMapNetworking{
     }
     
     //#MARK: - LogOut And Delete Session
-    func logoutMethod(complitionHandlerForLogOut :@escaping(_ success: Bool, _ error: Error?)->Void){
+    func logoutMethod(complitionHandlerForLogOut :@escaping(_ success: Bool, _ error: Error?)->Void) {
         
         let request = NSMutableURLRequest(url: URLFromComponents(nil, hostName: Constents.UdacityHostName, pathName: Constents.UdacityAPIPath, withPathExtension: nil))
         var xsrfCookie: HTTPCookie? = nil
@@ -108,24 +107,22 @@ extension OnTheMapNetworking{
         }
         
         let task = URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
-            guard error == nil else{
+            guard error == nil else {
                 complitionHandlerForLogOut(false, error)
-                print("------error loging out \(error)")
                 return
             }
             
             complitionHandlerForLogOut(true, nil)
             
             let range = Range(uncheckedBounds: (lower: 5, upper: data!.count - 5))
-            let newData = data?.subdata(in: range)
-            print("------log out Data is ********\(newData)")
+            _ = data?.subdata(in: range)
         }
         
         task.resume()
     }
     
     //#MARK: - Get Students Locations
-    func getStudentsLocations(_ complitionHandlerForGetStudentsLocations: @escaping(_ result: [StudentLocation]?, _ error: Error?)->Void){
+    func getStudentsLocations(_ complitionHandlerForGetStudentsLocations: @escaping(_ result: [StudentLocation]?, _ error: Error?)->Void) {
         
         //parameters 
         let parameters = ["limit": 100, "order": "-updatedAt"] as [String : Any]
@@ -134,7 +131,7 @@ extension OnTheMapNetworking{
         let _ = taskForGETMethod(nil, parameters as [String : AnyObject]?, hostName: Constents.ParseHostName, pathName: Constents.ParseAPIPath, needParseValues: true, needHeaderValues: false, needOriginalData: false) { (parsedData, originalData, error) in
             
             //cheking the error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 complitionHandlerForGetStudentsLocations(nil, error)
                 return
             }
@@ -143,7 +140,7 @@ extension OnTheMapNetworking{
                 let studentInfo = StudentLocation.studentInfoFromDictionary(results)
                 complitionHandlerForGetStudentsLocations(studentInfo, nil)
             }
-            else{
+            else {
                 complitionHandlerForGetStudentsLocations(nil, error)
             }
         }
@@ -158,7 +155,7 @@ extension OnTheMapNetworking{
         let _ = taskForMutableRequest(nil, requestMethod: Constents.MethodPOST, parameters: nil, hostName: Constents.ParseHostName, pathName: Constents.ParseAPIPath, jsonBody: jsonBody, needParseValues: true, needHeaderValues: true, needOriginalData: false) { (result, originalData, error) in
             
             // check for error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 complitionHandlerForPostLocation(nil, error)
                 print("--------------error in-----postStudentLocation------ \(error)")
                 return
@@ -175,13 +172,13 @@ extension OnTheMapNetworking{
     }
     
     //#MARK: - UPDATE student location
-    func updateStudentLocation(_ objectID: String!, uniqueKey: String, firstName: String, lastName: String, mapString: String, mediaUrl: String, latitude: Double, longitude: Double, complitionHandlerForUpdateLocation: @escaping(_ result: AnyObject?, _ error: Error?)->Void){
+    func updateStudentLocation(_ objectID: String!, uniqueKey: String, firstName: String, lastName: String, mapString: String, mediaUrl: String, latitude: Double, longitude: Double, complitionHandlerForUpdateLocation: @escaping(_ result: AnyObject?, _ error: Error?)->Void) {
         
         let jsonBody = "{\"\(StudentLocationKey.uniqueKey)\": \"\(uniqueKey)\", \"\(StudentLocationKey.firstName)\": \"\(firstName)\", \"\(StudentLocationKey.lastName)\": \"\(lastName)\",\"\(StudentLocationKey.mapString)\": \"\(mapString)\", \"\(StudentLocationKey.mediaURL)\": \"\(mediaUrl)\",\"\(StudentLocationKey.latitude)\": \(latitude), \"\(StudentLocationKey.longitude)\": \(longitude)}"
         
         let _ = taskForMutableRequest(objectID, requestMethod: "PUT", parameters: nil, hostName: Constents.ParseHostName, pathName: Constents.ParseAPIPath, jsonBody: jsonBody, needParseValues: true, needHeaderValues: true, needOriginalData: false) { (result, originalData, error) in
             // check for error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 complitionHandlerForUpdateLocation(nil, error)
                 return
             }
@@ -189,7 +186,7 @@ extension OnTheMapNetworking{
             if let data = result{
                 complitionHandlerForUpdateLocation(data, nil)
             }
-            else{
+            else {
                 complitionHandlerForUpdateLocation(nil, error)
             }
         }

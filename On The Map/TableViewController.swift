@@ -33,7 +33,7 @@ class TableViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]){
+        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]) {
             userProfile = userprofile
         }
         activityIndicator.hidesWhenStopped = true
@@ -47,7 +47,7 @@ class TableViewController: UIViewController {
         
     }
     
-    func callGetStudentLocation(){
+    func callGetStudentLocation() {
         
         uiupdateOnMainQueue {
             self.activityIndicator.startAnimating()
@@ -67,11 +67,11 @@ class TableViewController: UIViewController {
 
 
 //#MARK: hepler methods
-extension TableViewController{
+extension TableViewController {
     
-    func addLocation(){
+    func addLocation() {
         
-        if userdeFaults.value(forKey: "ObjectID") != nil{
+        if userdeFaults.value(forKey: "ObjectID") != nil {
             let firstName = userProfile["first_name"] as! String
             let lastName = userProfile["last_name"] as! String
             
@@ -92,19 +92,16 @@ extension TableViewController{
         
     }
     
-    func gotoAddLocation(){
+    func gotoAddLocation() {
         let AddLocationNavigation = storyboard?.instantiateViewController(withIdentifier: "AddLocationNavigation") as! UINavigationController
         present(AddLocationNavigation, animated: true, completion: nil)
     }
     
-    func logout(){
+    func logout() {
         
         OnTheMapNetworking.SharedInstance.logoutMethod { (success, error) in
             if success == true{
                 self.dismiss(animated: true, completion: nil)
-            }
-            else{
-                print("\(error)")
             }
         }
         
@@ -113,7 +110,7 @@ extension TableViewController{
     
 }
 
-extension TableViewController: UITableViewDelegate, UITableViewDataSource{
+extension TableViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return studentInfoArray.sharedInstance.studentInfo.count
@@ -142,7 +139,7 @@ extension TableViewController: UITableViewDelegate, UITableViewDataSource{
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if let urlString = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text{
+        if let urlString = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text {
             
             if Alert.SharedInstance.isValidURL(urlString){
                 if let url = URL(string: urlString){

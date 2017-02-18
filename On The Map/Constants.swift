@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension OnTheMapNetworking{
+extension OnTheMapNetworking {
     
     
     //constents

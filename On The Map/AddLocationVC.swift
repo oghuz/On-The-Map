@@ -41,11 +41,11 @@ class AddLocationVC: UIViewController {
         
         if showOnMapButton.titleLabel?.text == "Finish"{
             
-            if userDefaults.string(forKey: AddLocationVC.keyForObjectID) == nil{
+            if userDefaults.string(forKey: AddLocationVC.keyForObjectID) == nil {
                 postALocation(POST: true, UPDATE: false)
             }
                 
-            else if userDefaults.string(forKey: AddLocationVC.keyForObjectID) != nil{
+            else if userDefaults.string(forKey: AddLocationVC.keyForObjectID) != nil {
                 postALocation(POST: false, UPDATE: true)
             }
             
@@ -73,7 +73,7 @@ class AddLocationVC: UIViewController {
         userProfile = userDefaults.object(forKey: AddLocationVC.keyForProfileArray) as! [String: AnyObject]
     }
     
-    func configureViews(){
+    func configureViews() {
         
         //configure textfields
         mapString.delegate = self
@@ -90,24 +90,24 @@ class AddLocationVC: UIViewController {
 }
 
 //#MARK: Helper methods
-extension AddLocationVC{
+extension AddLocationVC {
     
     //search for a location
-    func searchForLocationAndLink(){
+    func searchForLocationAndLink() {
         let request = MKLocalSearchRequest()
         request.naturalLanguageQuery = mapString.text
         let search = MKLocalSearch(request: request)
         
         search.start { (response, error) in
             //checking the error
-            guard let theResponse = response, (error == nil) else{
+            guard let theResponse = response, (error == nil) else {
                 self.activityIndicator.stopAnimating()
                 Alert.SharedInstance.alert(self,title: "Fail", message: "Invalid Location or Link", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
                 
                 return
             }
             
-            guard let urlString = self.mediaUrl.text, Alert.SharedInstance.isValidURL(urlString) else{
+            guard let urlString = self.mediaUrl.text, Alert.SharedInstance.isValidURL(urlString) else {
                 uiupdateOnMainQueue {
                     self.activityIndicator.stopAnimating()
                     Alert.SharedInstance.alert(self,title: "Fail", message: "Invalid Location or Link", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
@@ -135,7 +135,7 @@ extension AddLocationVC{
     }
     
     //POST student Location
-    func postALocation(POST: Bool, UPDATE: Bool){
+    func postALocation(POST: Bool, UPDATE: Bool) {
         // parameters for json body
         let uniqueKey = userProfile["key"] as! String
         let firstName = userProfile["first_name"] as! String
@@ -152,16 +152,15 @@ extension AddLocationVC{
                 //check for error
                 guard (error == nil) else {
                     self.userDefaults.set(false, forKey: "didPostedLocation")
-                    print("the error posting student location \(error)")
                     return
                 }
                 
-                guard let resultData = result else{
+                guard let resultData = result else {
                     self.userDefaults.set(false, forKey: "didPostedLocation")
                     return
                 }
                 
-                if let objectID = resultData["objectId"]{
+                if let objectID = resultData["objectId"] {
                     self.userDefaults.set(objectID, forKey: AddLocationVC.keyForObjectID)
                     self.userDefaults.set(true, forKey: "didPostedLocation")
                     uiupdateOnMainQueue {
@@ -171,7 +170,7 @@ extension AddLocationVC{
                     }
                     
                 }
-                else{
+                else {
                     uiupdateOnMainQueue {
                         Alert.SharedInstance.alert(self, title: "Update Fail", message: "Could not Update user location", cancel: "Cancel", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: nil, complitionHandler: nil)
                     }
@@ -182,25 +181,24 @@ extension AddLocationVC{
             }
         }
         
-        if UPDATE == true{
+        if UPDATE == true {
             
-            if let objectid = userDefaults.string(forKey: AddLocationVC.keyForObjectID){
+            if let objectid = userDefaults.string(forKey: AddLocationVC.keyForObjectID) {
                 let objectId = objectid
                 
                 
                 OnTheMapNetworking.SharedInstance.updateStudentLocation(objectId, uniqueKey: uniqueKey, firstName: firstName, lastName: lastName, mapString: mapString!, mediaUrl: mediaUrl!, latitude: latitude, longitude: longitude, complitionHandlerForUpdateLocation: { (result, error) in
                     
-                    guard (error == nil) else{
+                    guard (error == nil) else {
                         self.userDefaults.set(false, forKey: "didUpdateLocation")
-                        print("there is an error \(error)")
                         uiupdateOnMainQueue {
-                            Alert.SharedInstance.alert(self, title: "Post Fail", message: "Could Not Post user location", cancel: "Cancel", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: nil, complitionHandler: { (UIAlertAction) in return})
+                            Alert.SharedInstance.alert(self, title: "Post Fail", message: "Could Not Post user location", cancel: "Cancel", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: nil, complitionHandler: { (UIAlertAction) in return })
                         }
 
                         return
                     }
                     
-                    if let data = result, let lastUpdated = data["updatedAt"]{
+                    if let data = result, let lastUpdated = data["updatedAt"] {
                         self.userDefaults.set(lastUpdated, forKey: "updatedAt")
                         
                         uiupdateOnMainQueue {
@@ -211,7 +209,7 @@ extension AddLocationVC{
                         
                     }
                         
-                    else{
+                    else {
                         uiupdateOnMainQueue {
                             Alert.SharedInstance.alert(self, title: "Post Fail", message: "Could Not Post user location", cancel: "Cancel", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: nil, complitionHandler: nil)
                         }
@@ -225,7 +223,7 @@ extension AddLocationVC{
     
     
     //showing up mapview by animation
-    func showMapview(){
+    func showMapview() {
         uiupdateOnMainQueue {
             UIView.animate(withDuration: 1, animations: {
                 self.mapView.alpha = 1.0
@@ -234,9 +232,9 @@ extension AddLocationVC{
     }
     
     //add annotation to mapview
-    func searchResultOnMap(){
+    func searchResultOnMap() {
         
-        for item in mapItems{
+        for item in mapItems {
             
             let placeMark = item.placemark
             let coordinates = placeMark.coordinate
@@ -256,22 +254,22 @@ extension AddLocationVC{
     }
     
     
-    func cancel(){
+    func cancel() {
         dismiss(animated: true, completion: nil)
     }
     
 }
 
 //#MARK: UITextfieldDelegate
-extension AddLocationVC: UITextFieldDelegate{
+extension AddLocationVC: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
-        if (textField.returnKeyType == .next){
+        if (textField.returnKeyType == .next) {
             mapString.resignFirstResponder()
             mediaUrl.becomeFirstResponder()
         }
-        else if (textField.returnKeyType == .search){
+        else if (textField.returnKeyType == .search) {
             self.view.endEditing(true)
             self.showOnMap(showOnMapButton)
             

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class OnTheMapNetworking: NSObject{
+class OnTheMapNetworking: NSObject {
     
     //shared Instance
     static let SharedInstance: OnTheMapNetworking = {
@@ -26,7 +26,7 @@ class OnTheMapNetworking: NSObject{
     }
     
     //#MARK: - GET URL request
-    func taskForGETMethod(_ method: String?, _ parameters: [String: AnyObject]?, hostName: String?, pathName: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForGET: @escaping(_ result:AnyObject?, _ data: Data?, _ error: NSError?)->Void)->URLSessionDataTask{
+    func taskForGETMethod(_ method: String?, _ parameters: [String: AnyObject]?, hostName: String?, pathName: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForGET: @escaping(_ result:AnyObject?, _ data: Data?, _ error: NSError?)->Void)->URLSessionDataTask {
         
         //set parameters
         let url = URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method)
@@ -34,26 +34,26 @@ class OnTheMapNetworking: NSObject{
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
-            func sendError(_ error: String){
+            func sendError(_ error: String) {
                 print(error)
                 let userInfo = [NSLocalizedDescriptionKey: error]
                 complitionHandlerForGET(nil, nil, NSError(domain: "taskForGETMethod", code: 1, userInfo: userInfo))
             }
             //ckecking for error
-            guard (error == nil) else{
-                sendError("-------there is an error \(error)")
+            guard (error == nil) else {
+                sendError("\(error)")
                 return
             }
             
             //check Status code
-            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else{
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
                 let theCode = (response as? HTTPURLResponse)?.statusCode
-                sendError("-----------status code not in range for GET request \(error), athe Code Is \(theCode)")
+                sendError("\(error), \(theCode)")
                 return
             }
             
-            guard let data = data else{
-                sendError("-------no data found \(error)")
+            guard let data = data else {
+                sendError("\(error)")
                 return
             }
             
@@ -66,25 +66,25 @@ class OnTheMapNetworking: NSObject{
     
     //#MARK: -Task for POST/PUT/DELETE
     
-    func taskForMutableRequest(_ method: String?, requestMethod: String ,parameters: [String: AnyObject]?, hostName: String?, pathName: String?, jsonBody: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForMutableRequest: @escaping(_ result: AnyObject?, _ originaldata: Data? ,_ error: Error?)->Void)->URLSessionDataTask{
+    func taskForMutableRequest(_ method: String?, requestMethod: String ,parameters: [String: AnyObject]?, hostName: String?, pathName: String?, jsonBody: String?, needParseValues: Bool, needHeaderValues: Bool, needOriginalData: Bool, complitionHandlerForMutableRequest: @escaping(_ result: AnyObject?, _ originaldata: Data? ,_ error: Error?)->Void)->URLSessionDataTask {
         
         let request = requestForReuse(URLFromComponents(parameters, hostName: hostName!, pathName: pathName!, withPathExtension: method), requestMethod: requestMethod, addParseValues: needParseValues, addValueToRequest: needHeaderValues)
         
         request.httpBody = jsonBody?.data(using: String.Encoding.utf8)
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
-            func sendError(_ error: String){
+            func sendError(_ error: String) {
                 let userInfo = [NSLocalizedDescriptionKey: error]
                 complitionHandlerForMutableRequest(nil, nil, NSError(domain: "taskFor\(requestMethod)Method", code: 1, userInfo: userInfo))
             }
             //ckecking for error
-            guard (error == nil) else{
+            guard (error == nil) else {
                 sendError("----net work error \(error)")
                 return
             }
             
             //check Status code
-            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else{
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
                 let theCode = (response as? HTTPURLResponse)?.statusCode
                 sendError("--------status code not in range for \(requestMethod) request------ \(error), \(theCode)")
                 
@@ -111,15 +111,15 @@ class OnTheMapNetworking: NSObject{
 
 extension OnTheMapNetworking{
     
-    func URLFromComponents(_ parameters: [String: AnyObject]?, hostName: String, pathName: String ,withPathExtension: String?)->URL{
+    func URLFromComponents(_ parameters: [String: AnyObject]?, hostName: String, pathName: String ,withPathExtension: String?)->URL {
         
         var components = URLComponents()
         components.scheme = Constents.APIScheme
         components.host = hostName
         components.path = pathName + (withPathExtension ?? "")
         components.queryItems = [URLQueryItem]()
-        if let parameters = parameters{
-            for (key, value) in parameters{
+        if let parameters = parameters {
+            for (key, value) in parameters {
                 let queryItem = URLQueryItem(name: key, value:"\(value)")
                 components.queryItems!.append(queryItem)
             }

@@ -33,7 +33,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]){            
+        if let userprofile = (userdeFaults.object(forKey: AddLocationVC.keyForProfileArray) as? [String: AnyObject]) {
             userProfile = userprofile
         }
         
@@ -71,7 +71,6 @@ class MapViewController: UIViewController {
                     Alert.SharedInstance.alert(self,title: "DownLoad Fail", message: "No Data Downloaded !", cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
                 }
                 
-                print("\(error)")
             }
         }
     
@@ -85,7 +84,7 @@ extension MapViewController{
     
     func addLocation(){
         
-        if userdeFaults.value(forKey: "ObjectID") != nil{
+        if userdeFaults.value(forKey: "ObjectID") != nil {
             let firstName = userProfile["first_name"] as! String
             let lastName = userProfile["last_name"] as! String
             
@@ -105,12 +104,12 @@ extension MapViewController{
         
     }
     
-    func gotoAddLocation(){
+    func gotoAddLocation() {
         let AddLocationNavigation = storyboard?.instantiateViewController(withIdentifier: "AddLocationNavigation") as! UINavigationController
         present(AddLocationNavigation, animated: true, completion: nil)
     }
     
-    func logout(){
+    func logout() {
         
         OnTheMapNetworking.SharedInstance.logoutMethod { (success, error) in
             if success == true{
@@ -121,11 +120,11 @@ extension MapViewController{
         dismiss(animated: true, completion: nil)
     }
     
-    func showPinOnMap(_ studentInfo: [StudentLocation]){
+    func showPinOnMap(_ studentInfo: [StudentLocation]) {
         //remove old annotations
         mapView.removeAnnotations(mapView.annotations)
         
-        for dataItem in studentInfo{
+        for dataItem in studentInfo {
             
             if let latitude = dataItem.latitude, let longitude = dataItem.longitude, let firsName = dataItem.firstName, let lastName = dataItem.lastName, let mediaLink = dataItem.mediaURL{
                 let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -145,7 +144,7 @@ extension MapViewController{
 
 //#MARK: MKMapViewDelegate
 
-extension MapViewController: MKMapViewDelegate{
+extension MapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
         
@@ -162,10 +161,10 @@ extension MapViewController: MKMapViewDelegate{
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView{
             
-            if let urlString = view.annotation?.subtitle{
+            if let urlString = view.annotation?.subtitle {
                 
-                if Alert.SharedInstance.isValidURL(urlString){
-                    if let url = URL(string: urlString!){
+                if Alert.SharedInstance.isValidURL(urlString) {
+                    if let url = URL(string: urlString!) {
                         if #available(iOS 10.0, *){
                             UIApplication.shared.open(url, options: [:], completionHandler: nil)
                         }
@@ -182,9 +181,9 @@ extension MapViewController: MKMapViewDelegate{
                 }
             }
         }
-        if control == view.leftCalloutAccessoryView{
+        if control == view.leftCalloutAccessoryView {
             
-            if let item = view.annotation?.coordinate{
+            if let item = view.annotation?.coordinate {
                 let placeMark = MKPlacemark(coordinate: item, addressDictionary: nil)
                 let mapItem = MKMapItem(placemark: placeMark)
                 if let name = view.annotation?.title{
@@ -199,11 +198,11 @@ extension MapViewController: MKMapViewDelegate{
     }
     
     
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView?{
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         let reuseID = "PinID"
         var mapPin = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) as? MKPinAnnotationView
-        if mapPin == nil{
+        if mapPin == nil {
             mapPin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
             mapPin?.animatesDrop = true
             mapPin?.pinTintColor = .red
@@ -217,7 +216,7 @@ extension MapViewController: MKMapViewDelegate{
             mapPin?.rightCalloutAccessoryView = rightButton
             
         }
-        else{
+        else {
             mapPin?.annotation = annotation
         }
         return mapPin

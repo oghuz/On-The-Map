@@ -11,7 +11,8 @@ import Foundation
 import SystemConfiguration
 
 class LogInVC: UIViewController {
-    
+    //using opensource reachability file for network condition checking
+    let reachBility = Reachability()
     
     let userDefaults = UserDefaults.standard
     let udacitySignupURL = URL(string: "https://auth.udacity.com/sign-up?next=https%3A%2F%2Fclassroom.udacity.com%2Fauthenticated")
@@ -28,7 +29,7 @@ class LogInVC: UIViewController {
     @IBAction func login(_ sender: Any) {
         
         //check network connection
-    
+        
         //starting indicator
         activityIndicator(start: true)
         passwordField.resignFirstResponder()
@@ -40,17 +41,18 @@ class LogInVC: UIViewController {
                 let error = "Email or Passward Empty !"
                 Alert.SharedInstance.alert(self,title: "Log In Fail", message: error, cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
             }
+            
         }
             
-        else{
+        else if (reachBility?.isReachable)! {
             OnTheMapNetworking.SharedInstance.loginWithCredentials(userName: emailField.text!, passward: passwordField.text!, complitionHandlerForLogin: { (success, key, error) in
                 uiupdateOnMainQueue {
-                    if success{
+                    if success {
                         self.saveProfileToUserDefaults(key)
                         self.activityIndicator(start: false)
                         self.completeLogin()
                     }
-                    else{
+                    else {
                         self.activityIndicator(start: false)
                         let error = "Invalid Email or Passward !"
                         Alert.SharedInstance.alert(self,title: "Log In Fail", message: error, cancel: "Dismiss", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: false, complitionHandler: nil)
@@ -58,15 +60,22 @@ class LogInVC: UIViewController {
                 }
             })
         }
+            
+        else {  //!(reachBility?.isReachable)!
+            Alert.SharedInstance.alert(self, title: "", message: "The internet connection appears to be offline", cancel: "Cancel", ok: nil, alertStyle: .alert, actionStyleOk: nil, actionStyleCancel: .cancel, needOkAction: nil, complitionHandler: nil)
+            activityIndicator(start: false)
+        }
+        
+        
     }
     
     //simply open up the udacity sign up page
     @IBAction func signUp(_ sender: Any) {
         //activityIndicator(start: true)
-        if #available(iOS 10.0, *){
+        if #available(iOS 10.0, *) {
             UIApplication.shared.open(udacitySignupURL!, options: [:], completionHandler: nil)
         }
-        else{
+        else {
             UIApplication.shared.openURL(udacitySignupURL!)
         }
     }
@@ -74,7 +83,7 @@ class LogInVC: UIViewController {
 }
 
 //#MARK: - CLogInVC life cycle methods
-extension LogInVC{
+extension LogInVC {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -84,7 +93,7 @@ extension LogInVC{
         emailField.backgroundColor = .cyan
         passwordField.placeholder = "Passward"
         passwordField.backgroundColor = .cyan
-
+        
         //activity indicator
         activityIndicator(start: false)
         
@@ -128,15 +137,15 @@ extension LogInVC{
 
 //#MARK: - helper methods
 extension LogInVC{
-
+    
     // star and stop activity indicator
-    func activityIndicator(start: Bool){
+    func activityIndicator(start: Bool) {
         
-        if start{
+        if start {
             self.activityIndicator.alpha = 1.0
             self.activityIndicator.startAnimating()
         }
-        if !start{
+        if !start {
             self.activityIndicator.alpha = 0.0
             self.activityIndicator.stopAnimating()
         }
@@ -144,23 +153,17 @@ extension LogInVC{
     
     
     //save user profile with nsuserDefault
-    func saveProfileToUserDefaults(_ uniuqKey: String?){
+    func saveProfileToUserDefaults(_ uniuqKey: String?) {
         
         //userDefaults.set(toBeSavedArray, forKey: "userProfile")
         if let key = uniuqKey{
             OnTheMapNetworking.SharedInstance.getStudentProfileInfo(key) { (result, error) in
                 
-                if error == nil{
+                if error == nil {
                     if let profile = result{
                         return self.userDefaults.set(profile, forKey: "userProfile")
                     }
-                        
-                    else {
-                        print("the is no user profile, error \(error)")
-                    }
-                }
-                else{
-                    print("error from get student profile methos \(error)")
+                    
                 }
             }
         }
@@ -182,15 +185,15 @@ extension LogInVC{
 // dealing with keyboard
 extension LogInVC: UITextFieldDelegate{
     
-
+    
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
-        if (textField.returnKeyType == .next){
+        if (textField.returnKeyType == .next) {
             emailField.resignFirstResponder()
             passwordField.becomeFirstResponder()
         }
-        else if (textField.returnKeyType == .done){
+        else if (textField.returnKeyType == .done) {
             view.endEditing(true)
             self.login(loginButton)
         }
