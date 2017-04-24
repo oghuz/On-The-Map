@@ -1,8 +1,8 @@
 # On-The-Map
 ## Discription
-User login( for Udacity account) with username and password, user can see the other users location on map, navigate to locations provided by users, or see user information on table view, open their media links if one provided
+Built an app that posts user-generated location information to a shared map, pulling the locations of fellow Nanodegree students, with custom messages about themselves or their learning experience.
 ## Tool and Language
-  `Swift 3`  `Xcode 8`
+  `Swift 3`  `Xcode 8` `UIKit` `NSURLSessions` `JSON Parsing` `MKMapViews`
 ## install
 `download` or `clone` the repository and open it in `Xcode`.
 this project has a number of _**reusable**_ networking codes, use it in your project under `license`
