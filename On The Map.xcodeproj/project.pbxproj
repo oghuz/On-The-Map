@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D64471101EE3207D00B9354C /* IBDesgnable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D644710F1EE3207D00B9354C /* IBDesgnable.swift */; };
 		D6522BCE1E4A3A8200B1DB13 /* ConvenienceMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6522BCD1E4A3A8200B1DB13 /* ConvenienceMethods.swift */; };
 		D6539A021E57B64C005EE5FA /* studentInfoArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6539A011E57B64C005EE5FA /* studentInfoArray.swift */; };
 		D6539A041E57EE5B005EE5FA /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6539A031E57EE5B005EE5FA /* TableViewController.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D644710F1EE3207D00B9354C /* IBDesgnable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IBDesgnable.swift; sourceTree = "<group>"; };
 		D6522BCD1E4A3A8200B1DB13 /* ConvenienceMethods.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConvenienceMethods.swift; sourceTree = "<group>"; };
 		D6539A011E57B64C005EE5FA /* studentInfoArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = studentInfoArray.swift; sourceTree = "<group>"; };
 		D6539A031E57EE5B005EE5FA /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				D6EBAA801E42A21900941129 /* ViewConfiguration.swift */,
+				D644710F1EE3207D00B9354C /* IBDesgnable.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -344,6 +347,7 @@
 				D6522BCE1E4A3A8200B1DB13 /* ConvenienceMethods.swift in Sources */,
 				D6EBAA811E42A21900941129 /* ViewConfiguration.swift in Sources */,
 				D694ECBA1E4E4EAC003DC652 /* StudentLocation.swift in Sources */,
+				D64471101EE3207D00B9354C /* IBDesgnable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
