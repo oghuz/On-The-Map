@@ -11,7 +11,7 @@ import Foundation
 import UIKit
 
 @IBDesignable class DesignableButton: UIButton {
-    
+    //setting up corner radiou for buttons
     @IBInspectable var cornerRadius: CGFloat = 0.0 {
         didSet{
             self.layer.cornerRadius = cornerRadius
