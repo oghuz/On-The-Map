@@ -17,7 +17,7 @@ import UIKit
             self.layer.cornerRadius = cornerRadius
         }
     }
-    
+    // setting up corner radious for buttons and textfields
     @IBInspectable var borderWidth: CGFloat = 0.0 {
         didSet{
             self.layer.borderWidth = borderWidth
