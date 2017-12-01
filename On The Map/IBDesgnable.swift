@@ -23,7 +23,7 @@ import UIKit
             self.layer.borderWidth = borderWidth
         }
     }
-    
+    // border colors for outlets
     @IBInspectable var borderColor: UIColor = UIColor.blue {
         didSet{
             self.layer.borderColor = borderColor.cgColor
