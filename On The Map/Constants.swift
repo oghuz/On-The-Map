@@ -32,7 +32,6 @@ extension OnTheMapNetworking {
         static let UserName = "username"
         static let Passward = "password"
         
-        
         //UDAcity login/Logout Auth URL
         static let UdacityAuthMethodURL = "https://www.udacity.com/api/session"
         
