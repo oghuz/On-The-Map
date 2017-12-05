@@ -56,8 +56,6 @@ struct StudentLocation {
         }
     }
     
-    
-    
     // take data as parameter and create a student location object
     static func studentInfoFromDictionary(_ results: [[String: AnyObject]])->[StudentLocation] {
         
@@ -67,7 +65,6 @@ struct StudentLocation {
         }
         
         return studentLocations
-        
     }
         
 }
