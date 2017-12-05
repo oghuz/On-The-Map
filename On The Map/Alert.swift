@@ -1,4 +1,4 @@
-//
+// 
 //  AlertViewController.swift
 //  On The Map
 //
@@ -47,6 +47,5 @@ class Alert: NSObject {
         }
         return false
     }
-
 
 }
