@@ -108,6 +108,30 @@ class OnTheMapNetworking: NSObject {
     
 }
 
+//helper function that parses json data
+    fileprivate func parseDataWithComplitionHandler(_ data: Data, passOriginalData: Bool ,complitionHandlerForConvertData: (_ result:AnyObject?, _ originaldata: Data? ,_ error: NSError?)->Void){
+        
+        if passOriginalData == true {
+            complitionHandlerForConvertData(nil, data, nil)
+        }
+        else{
+            
+            //let stringData = NSString(data: data, encoding: String.Encoding.utf8.rawValue)!
+            //let newData = stringData.data(using: String.Encoding.utf8.rawValue)
+            var parsedData: AnyObject? = nil
+            
+            do {
+                parsedData = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
+            } catch {
+                let userInfo = [NSLocalizedDescriptionKey: error]
+                complitionHandlerForConvertData(nil, data ,NSError(domain: "parseDataWithComplitionHandler", code: 1, userInfo: userInfo))
+            }
+            
+            complitionHandlerForConvertData(parsedData, nil, nil)
+        }
+    }
+    
+
 
 extension OnTheMapNetworking{
     
@@ -144,28 +168,6 @@ extension OnTheMapNetworking{
         return request
     }
     
-    //helper function that parses json data
-    fileprivate func parseDataWithComplitionHandler(_ data: Data, passOriginalData: Bool ,complitionHandlerForConvertData: (_ result:AnyObject?, _ originaldata: Data? ,_ error: NSError?)->Void){
-        
-        if passOriginalData == true {
-            complitionHandlerForConvertData(nil, data, nil)
-        }
-        else{
-            
-            //let stringData = NSString(data: data, encoding: String.Encoding.utf8.rawValue)!
-            //let newData = stringData.data(using: String.Encoding.utf8.rawValue)
-            var parsedData: AnyObject? = nil
-            
-            do {
-                parsedData = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
-            } catch {
-                let userInfo = [NSLocalizedDescriptionKey: error]
-                complitionHandlerForConvertData(nil, data ,NSError(domain: "parseDataWithComplitionHandler", code: 1, userInfo: userInfo))
-            }
-            
-            complitionHandlerForConvertData(parsedData, nil, nil)
-        }
-    }
     
     
     
